@@ -95,7 +95,9 @@ export default function CommitmentDetailPage() {
   const canSubmitProof =
     isCreator &&
     (commitment.status === "active" ||
-      commitment.status === "pending_proof");
+      commitment.status === "pending_proof" ||
+      commitment.status === "completed" ||
+      commitment.status === "awaiting_verification");
   const canSelfReport =
     isCreator &&
     !commitment.deadline &&

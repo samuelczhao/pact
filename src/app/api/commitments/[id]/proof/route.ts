@@ -1,5 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 
+const ALLOWED_STATUSES = new Set([
+  "active",
+  "pending_proof",
+  "completed",
+  "awaiting_verification",
+]);
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -25,9 +32,9 @@ export async function POST(
   if (commitment.creator_id !== user.id) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (commitment.status !== "active" && commitment.status !== "pending_proof") {
+  if (!ALLOWED_STATUSES.has(commitment.status)) {
     return Response.json(
-      { error: "Proof can only be submitted for active or pending_proof commitments" },
+      { error: "Cannot submit proof for this commitment" },
       { status: 400 },
     );
   }
@@ -42,13 +49,18 @@ export async function POST(
     );
   }
 
+  const updates: Record<string, unknown> = {
+    proof_text: proof_text?.trim() || null,
+    proof_url: proof_url?.trim() || null,
+  };
+
+  if (commitment.status === "active" || commitment.status === "pending_proof") {
+    updates.status = "awaiting_verification";
+  }
+
   const { data, error } = await supabase
     .from("commitments")
-    .update({
-      proof_text: proof_text?.trim() || null,
-      proof_url: proof_url?.trim() || null,
-      status: "awaiting_verification" as const,
-    })
+    .update(updates)
     .eq("id", id)
     .select()
     .single();
