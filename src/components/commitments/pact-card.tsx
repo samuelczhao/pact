@@ -15,6 +15,8 @@ interface PactCardProps {
 export function PactCard({ commitment }: PactCardProps) {
   const router = useRouter();
 
+  const creatorName = commitment.creator?.display_name ?? "Unknown";
+
   const partnerNames: string[] = [];
   if (commitment.commitment_partners && commitment.commitment_partners.length > 0) {
     for (const cp of commitment.commitment_partners) {
@@ -73,7 +75,7 @@ export function PactCard({ commitment }: PactCardProps) {
             </span>
             <span className="inline-flex items-center gap-1">
               <User className="size-3" />
-              {partnerDisplay}
+              {creatorName} 👀 by {partnerDisplay}
             </span>
           </div>
           {(commitment.status === "active" || commitment.status === "pending_proof") && (
