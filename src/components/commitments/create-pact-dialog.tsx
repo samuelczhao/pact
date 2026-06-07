@@ -31,6 +31,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [hasDeadline, setHasDeadline] = useState(true);
   const [deadline, setDeadline] = useState<Date | undefined>();
   const [partners, setPartners] = useState<PartnerEntry[]>([]);
   const [proofRequirement, setProofRequirement] = useState("");
@@ -40,6 +41,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
     setTitle("");
     setDescription("");
     setAmount("");
+    setHasDeadline(true);
     setDeadline(undefined);
     setPartners([]);
     setProofRequirement("");
@@ -58,7 +60,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
       toast.error("Amount must be greater than 0");
       return;
     }
-    if (!deadline) {
+    if (hasDeadline && !deadline) {
       toast.error("Deadline is required");
       return;
     }
@@ -73,7 +75,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
           title: title.trim(),
           description: description.trim() || null,
           amount: parsedAmount,
-          deadline: deadline.toISOString(),
+          deadline: hasDeadline && deadline ? deadline.toISOString() : null,
           proof_requirement: proofRequirement.trim() || null,
           is_public: isPublic,
           partners: partners.map((p) => ({
@@ -148,8 +150,24 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label>Deadline</Label>
-            <DeadlinePicker value={deadline} onChange={setDeadline} />
+            <div className="flex items-center justify-between">
+              <Label>Deadline</Label>
+              <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-400">
+                <input
+                  type="checkbox"
+                  checked={!hasDeadline}
+                  onChange={(e) => {
+                    setHasDeadline(!e.target.checked);
+                    if (e.target.checked) setDeadline(undefined);
+                  }}
+                  className="size-3.5 accent-primary"
+                />
+                No deadline
+              </label>
+            </div>
+            {hasDeadline && (
+              <DeadlinePicker value={deadline} onChange={setDeadline} />
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">

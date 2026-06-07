@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  if (!deadline || new Date(deadline) <= new Date()) {
+  if (deadline && new Date(deadline) <= new Date()) {
     return Response.json(
       { error: "Deadline must be in the future" },
       { status: 400 },
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       title: title.trim(),
       description: description?.trim() || null,
       amount,
-      deadline,
+      deadline: deadline || null,
       proof_requirement: proof_requirement?.trim() || null,
       is_public: is_public !== false,
       status: "active" as const,

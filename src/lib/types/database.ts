@@ -38,7 +38,7 @@ export interface Commitment {
   title: string;
   description: string | null;
   amount: number;
-  deadline: string;
+  deadline: string | null;
   proof_requirement: string | null;
   status: CommitmentStatus;
   creator_id: string;

@@ -19,7 +19,8 @@ export function generateVenmoLink(
   return `venmo://paycharge?txn=pay&recipients=${venmoUsername}&amount=${amount}&note=${note}`;
 }
 
-export function formatDeadline(deadline: string): string {
+export function formatDeadline(deadline: string | null): string {
+  if (!deadline) return "No deadline";
   const date = new Date(deadline);
   if (isPast(date)) {
     return `${formatDistanceToNow(date)} ago`;
@@ -31,7 +32,8 @@ export function isEditable(editableUntil: string): boolean {
   return !isPast(new Date(editableUntil));
 }
 
-export function minutesRemaining(deadline: string): number {
+export function minutesRemaining(deadline: string | null): number {
+  if (!deadline) return Infinity;
   return differenceInMinutes(new Date(deadline), new Date());
 }
 

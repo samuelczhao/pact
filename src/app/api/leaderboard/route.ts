@@ -84,7 +84,7 @@ function computeStreak(commitments: Commitment[]): number {
     .filter((c) => c.status === "completed" || c.status === "failed")
     .sort(
       (a, b) =>
-        new Date(b.deadline).getTime() - new Date(a.deadline).getTime(),
+        new Date(b.deadline ?? b.created_at).getTime() - new Date(a.deadline ?? a.created_at).getTime(),
     );
 
   let streak = 0;

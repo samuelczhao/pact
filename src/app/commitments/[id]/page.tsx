@@ -96,6 +96,10 @@ export default function CommitmentDetailPage() {
     isCreator &&
     (commitment.status === "active" ||
       commitment.status === "pending_proof");
+  const canSelfReport =
+    isCreator &&
+    !commitment.deadline &&
+    commitment.status === "active";
   const canVerify =
     isPartner && commitment.status === "awaiting_verification";
   const showVenmo = isCreator && commitment.status === "failed";
@@ -152,7 +156,7 @@ export default function CommitmentDetailPage() {
             <DetailItem
               icon={<Clock className="size-4" />}
               label="Deadline"
-              value={`Due ${formatDeadline(commitment.deadline)}`}
+              value={commitment.deadline ? `Due ${formatDeadline(commitment.deadline)}` : "No deadline"}
             />
             <DetailItem
               icon={<User className="size-4" />}
@@ -186,6 +190,13 @@ export default function CommitmentDetailPage() {
             <>
               <Separator />
               <EditPactInline commitment={commitment} onSaved={reload} />
+            </>
+          )}
+
+          {canSelfReport && (
+            <>
+              <Separator />
+              <SelfReportButtons commitmentId={commitment.id} hasPartners={partnerCount > 0} onReported={reload} />
             </>
           )}
         </CardContent>
@@ -326,6 +337,74 @@ function EditPactInline({
           Cancel
         </Button>
       </div>
+    </div>
+  );
+}
+
+function SelfReportButtons({
+  commitmentId,
+  hasPartners,
+  onReported,
+}: {
+  commitmentId: string;
+  hasPartners: boolean;
+  onReported: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function report(outcome: "completed" | "failed") {
+    setLoading(true);
+    try {
+      if (outcome === "failed") {
+        const res = await fetch(`/api/commitments/${commitmentId}/self-fail`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        if (!res.ok) throw new Error("Failed");
+        toast.success("Pact marked as failed.");
+      } else if (hasPartners) {
+        const res = await fetch(`/api/commitments/${commitmentId}/proof`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ proof_text: "Self-reported: completed" }),
+        });
+        if (!res.ok) throw new Error("Failed");
+        toast.success("Marked as done. Waiting for partner verification.");
+      } else {
+        const res = await fetch(`/api/commitments/${commitmentId}/self-complete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        if (!res.ok) throw new Error("Failed");
+        toast.success("Pact completed!");
+      }
+      onReported();
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex gap-2">
+      <Button
+        className="flex-1 bg-green-600 hover:bg-green-700"
+        disabled={loading}
+        onClick={() => report("completed")}
+      >
+        I did it
+      </Button>
+      <Button
+        variant="destructive"
+        className="flex-1"
+        disabled={loading}
+        onClick={() => report("failed")}
+      >
+        I failed
+      </Button>
     </div>
   );
 }

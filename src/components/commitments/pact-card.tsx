@@ -25,11 +25,11 @@ export function PactCard({ commitment }: PactCardProps) {
   }
   const partnerDisplay = partnerNames.length > 0 ? partnerNames.join(", ") : "No partner";
 
-  const minsLeft = minutesRemaining(commitment.deadline);
+  const minsLeft = commitment.deadline ? minutesRemaining(commitment.deadline) : null;
   const isUrgent =
-    commitment.status === "active" && minsLeft > 0 && minsLeft <= 1440;
+    commitment.status === "active" && minsLeft !== null && minsLeft > 0 && minsLeft <= 1440;
   const isOverdue =
-    commitment.status === "active" && minsLeft <= 0;
+    commitment.status === "active" && minsLeft !== null && minsLeft <= 0;
 
   return (
     <Card
@@ -69,7 +69,7 @@ export function PactCard({ commitment }: PactCardProps) {
           <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
             <span className="inline-flex items-center gap-1">
               <Clock className="size-3" />
-              Due {formatDeadline(commitment.deadline)}
+              {commitment.deadline ? `Due ${formatDeadline(commitment.deadline)}` : "No deadline"}
             </span>
             <span className="inline-flex items-center gap-1">
               <User className="size-3" />
