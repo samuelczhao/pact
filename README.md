@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pact
+
+Accountability app where users make commitments with real dollar stakes. Fail a pact and you owe your partners via Venmo. Built for a small friend group.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Clone the repo
+git clone https://github.com/your-org/pact.git
+cd pact
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Fill in values (see Environment Variables below)
+
+# Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local` with these values (never commit this file):
 
-## Learn More
+| Variable | Description | Where to find it |
+|----------|-------------|------------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | Supabase Dashboard → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key for client-side auth | Supabase Dashboard → Settings → API → Project API keys |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key for server-side operations (keep secret) | Supabase Dashboard → Settings → API → Project API keys → click "Reveal" |
 
-To learn more about Next.js, take a look at the following resources:
+## Git Workflow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `main` is protected — requires 1 PR approval
+- Create feature branches off `main`
+- Open a PR when ready for review
+- Vercel auto-deploys preview environments for every PR
+- Merging to `main` triggers production deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+- **Next.js 16** (App Router)
+- **Supabase** (Postgres, Auth, Realtime, Storage)
+- **Tailwind CSS** + **shadcn/ui**
+- **TypeScript**
+- **Vercel** (hosting + deployments)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/app/              → Pages and API routes (App Router)
+src/components/       → React components (ui/, commitments/, dashboard/, etc.)
+src/lib/              → Utilities, Supabase clients, types, constants
+supabase/             → Database migrations and config
+proxy.ts              → Auth guard (Next.js 16 replaces middleware.ts)
+```

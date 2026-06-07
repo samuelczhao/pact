@@ -22,7 +22,7 @@ export default function OnboardingPage() {
         setDisplayName(user.user_metadata.full_name);
       }
     });
-  }, [supabase.auth]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

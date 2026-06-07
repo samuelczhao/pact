@@ -23,11 +23,16 @@ export default function SettingsPage() {
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("display_name, venmo_username")
         .eq("id", user.id)
         .single<Pick<Profile, "display_name" | "venmo_username">>();
+
+      if (error) {
+        toast.error("Failed to load profile.");
+        return;
+      }
 
       if (data) {
         setDisplayName(data.display_name ?? "");
@@ -36,7 +41,7 @@ export default function SettingsPage() {
     }
 
     loadProfile();
-  }, [supabase]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
