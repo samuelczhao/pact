@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     amount,
     deadline,
     proof_requirement,
+    is_public,
     partners,
     // Legacy single-partner fields
     partner_id,
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
       amount,
       deadline,
       proof_requirement: proof_requirement?.trim() || null,
+      is_public: is_public !== false,
       status: "active" as const,
       creator_id: user.id,
       partner_id: partner_id || null,

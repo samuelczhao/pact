@@ -54,28 +54,26 @@ export function PartnerPicker({ value, onChange }: PartnerPickerProps) {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!open) return;
 
+    let cancelled = false;
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(async () => {
-      if (!query.trim()) {
-        if (!cancelled) setResults([]);
-        return;
-      }
-      const res = await fetch(
-        `/api/users?q=${encodeURIComponent(query)}`,
-      );
+      const url = query.trim()
+        ? `/api/users?q=${encodeURIComponent(query)}`
+        : "/api/users";
+      const res = await fetch(url);
       if (res.ok && !cancelled) {
         setResults(await res.json());
       }
-    }, DEBOUNCE_MS);
+    }, query ? DEBOUNCE_MS : 0);
 
     return () => {
       cancelled = true;
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, open]);
 
   const selectedIds = new Set(value.map((p) => p.partner_id).filter(Boolean));
 

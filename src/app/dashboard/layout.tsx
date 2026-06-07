@@ -16,6 +16,16 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarded")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || !profile.onboarded) {
+    redirect("/onboarding");
+  }
+
   return (
     <div className="flex flex-1 flex-col">
       <Header user={user} />

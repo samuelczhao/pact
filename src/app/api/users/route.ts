@@ -14,16 +14,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q");
 
-  if (!q || q.trim().length === 0) {
-    return Response.json([]);
-  }
-
-  const { data, error } = await supabase
+  let query = supabase
     .from("profiles")
     .select("id, display_name, avatar_url")
-    .ilike("display_name", `%${q.trim()}%`)
     .neq("id", user.id)
+    .eq("onboarded", true)
     .limit(MAX_RESULTS);
+
+  if (q && q.trim().length > 0) {
+    query = query.ilike("display_name", `%${q.trim()}%`);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });

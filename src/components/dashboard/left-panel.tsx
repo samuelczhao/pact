@@ -117,7 +117,7 @@ export function LeftPanel() {
   );
   const toVerify = commitments.filter(
     (c) =>
-      c.status === "awaiting_verification" &&
+      c.creator_id !== userId &&
       (c.partner_id === userId ||
         c.commitment_partners?.some((p) => p.partner_id === userId)),
   );
@@ -149,7 +149,7 @@ export function LeftPanel() {
             My Pacts{myPacts.length > 0 ? ` (${myPacts.length})` : ""}
           </TabsTrigger>
           <TabsTrigger value="to-verify">
-            To Verify
+            Watching
             {toVerify.length > 0 ? ` (${toVerify.length})` : ""}
           </TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
@@ -165,7 +165,7 @@ export function LeftPanel() {
         <TabsContent value="to-verify" className="mt-3">
           <PactList
             commitments={toVerify}
-            emptyMessage="No pacts waiting for your verification."
+            emptyMessage="No pacts where you're a partner."
           />
         </TabsContent>
 

@@ -47,6 +47,7 @@ export interface Commitment {
   partner_email: string | null;
   proof_text: string | null;
   proof_url: string | null;
+  is_public: boolean;
   editable_until: string;
   created_at: string;
   updated_at: string;
@@ -64,6 +65,16 @@ export interface Notification {
   read: boolean;
   created_at: string;
   commitment?: Commitment;
+}
+
+export interface FeedEvent {
+  id: string;
+  commitment_id: string;
+  user_id: string;
+  event_type: string;
+  message: string;
+  created_at: string;
+  profile?: Profile;
 }
 
 export interface LeaderboardEntry {

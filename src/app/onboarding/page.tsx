@@ -45,12 +45,12 @@ export default function OnboardingPage() {
 
     const { error } = await supabase
       .from("profiles")
-      .update({
+      .upsert({
+        id: user.id,
         display_name: displayName,
         venmo_username: venmoUsername || null,
         onboarded: true,
-      })
-      .eq("id", user.id);
+      });
 
     if (error) {
       toast.error("Failed to save profile. Please try again.");

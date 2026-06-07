@@ -34,6 +34,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
   const [deadline, setDeadline] = useState<Date | undefined>();
   const [partners, setPartners] = useState<PartnerEntry[]>([]);
   const [proofRequirement, setProofRequirement] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
 
   function resetForm() {
     setTitle("");
@@ -42,6 +43,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
     setDeadline(undefined);
     setPartners([]);
     setProofRequirement("");
+    setIsPublic(true);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -73,6 +75,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
           amount: parsedAmount,
           deadline: deadline.toISOString(),
           proof_requirement: proofRequirement.trim() || null,
+          is_public: isPublic,
           partners: partners.map((p) => ({
             partner_id: p.partner_id ?? null,
             partner_name: p.partner_name ?? null,
@@ -165,6 +168,19 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
               onChange={(e) => setProofRequirement(e.target.value)}
             />
           </div>
+
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border border-zinc-800 px-3 py-2.5">
+            <div>
+              <p className="text-sm font-medium text-zinc-200">Public pact</p>
+              <p className="text-xs text-zinc-400">Show on the social feed</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              className="size-4 accent-primary"
+            />
+          </label>
 
           <Button type="submit" disabled={loading} className="mt-2">
             {loading ? "Creating..." : "Create Pact"}
