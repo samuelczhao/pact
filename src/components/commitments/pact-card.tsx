@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Clock, User, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/commitments/status-badge";
+import { RoastButton } from "@/components/commitments/roast-button";
 import { formatCurrency, formatDeadline, minutesRemaining } from "@/lib/utils";
 import type { Commitment } from "@/lib/types/database";
 
@@ -64,15 +65,20 @@ export function PactCard({ commitment }: PactCardProps) {
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
-          <span className="inline-flex items-center gap-1">
-            <Clock className="size-3" />
-            Due {formatDeadline(commitment.deadline)}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <User className="size-3" />
-            {partnerDisplay}
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+            <span className="inline-flex items-center gap-1">
+              <Clock className="size-3" />
+              Due {formatDeadline(commitment.deadline)}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <User className="size-3" />
+              {partnerDisplay}
+            </span>
+          </div>
+          {(commitment.status === "active" || commitment.status === "pending_proof") && (
+            <RoastButton title={commitment.title} amount={commitment.amount} />
+          )}
         </div>
       </CardContent>
     </Card>

@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/tabs";
 import { CreatePactDialog } from "@/components/commitments/create-pact-dialog";
 import { PactList } from "@/components/commitments/pact-list";
+import { SocialFeed } from "@/components/dashboard/social-feed";
+import { LeaderboardTable } from "@/components/dashboard/leaderboard-table";
 import type { Commitment } from "@/lib/types/database";
 
 const MY_PACT_STATUSES = new Set([
@@ -115,7 +117,7 @@ export function LeftPanel() {
   const myPacts = commitments.filter(
     (c) => c.creator_id === userId && MY_PACT_STATUSES.has(c.status),
   );
-  const toVerify = commitments.filter(
+  const watching = commitments.filter(
     (c) =>
       c.creator_id !== userId &&
       (c.partner_id === userId ||
@@ -127,56 +129,75 @@ export function LeftPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-zinc-100">
-          Pacts
-        </h2>
-        <CreatePactDialog
-          onCreated={() => setRefreshKey((k) => k + 1)}
-        />
-      </div>
-
-      {loading ? (
-        <div className="flex flex-col gap-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-lg bg-zinc-800" />
-          ))}
-        </div>
-      ) : (
       <Tabs defaultValue="my-pacts">
-        <TabsList variant="line">
+        <div className="flex items-center justify-between gap-4">
+          <TabsList variant="line" className="flex-1">
           <TabsTrigger value="my-pacts">
-            My Pacts{myPacts.length > 0 ? ` (${myPacts.length})` : ""}
+            Active{myPacts.length > 0 ? ` (${myPacts.length})` : ""}
           </TabsTrigger>
-          <TabsTrigger value="to-verify">
-            Watching
-            {toVerify.length > 0 ? ` (${toVerify.length})` : ""}
+          <TabsTrigger value="watching">
+            Watching{watching.length > 0 ? ` (${watching.length})` : ""}
           </TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="my-pacts" className="mt-3">
-          <PactList
-            commitments={myPacts}
-            emptyMessage="No active pacts. Create one to get started."
+          <TabsTrigger value="feed">Feed</TabsTrigger>
+          <TabsTrigger value="leaderboard">Board</TabsTrigger>
+          </TabsList>
+          <CreatePactDialog
+            onCreated={() => setRefreshKey((k) => k + 1)}
           />
+        </div>
+
+        <TabsContent value="my-pacts" className="mt-4">
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <PactList
+              commitments={myPacts}
+              emptyMessage="No active pacts. Create one to get started."
+            />
+          )}
         </TabsContent>
 
-        <TabsContent value="to-verify" className="mt-3">
-          <PactList
-            commitments={toVerify}
-            emptyMessage="No pacts where you're a partner."
-          />
+        <TabsContent value="watching" className="mt-4">
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <PactList
+              commitments={watching}
+              emptyMessage="No pacts where you're a partner."
+            />
+          )}
         </TabsContent>
 
-        <TabsContent value="history" className="mt-3">
-          <PactList
-            commitments={history}
-            emptyMessage="No completed or failed pacts yet."
-          />
+        <TabsContent value="history" className="mt-4">
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <PactList
+              commitments={history}
+              emptyMessage="No completed or failed pacts yet."
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="feed" className="mt-4">
+          <SocialFeed />
+        </TabsContent>
+
+        <TabsContent value="leaderboard" className="mt-4">
+          <LeaderboardTable />
         </TabsContent>
       </Tabs>
-      )}
+    </div>
+  );
+}
+
+function Skeleton() {
+  return (
+    <div className="flex flex-col gap-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-20 animate-pulse rounded-lg bg-zinc-800/50" />
+      ))}
     </div>
   );
 }

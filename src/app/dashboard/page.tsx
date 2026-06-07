@@ -7,26 +7,8 @@ import { LeaderboardTable } from "@/components/dashboard/leaderboard-table";
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
-      <Tabs defaultValue="pacts">
-        <TabsList variant="line" className="mb-4">
-          <TabsTrigger value="pacts">My Pacts</TabsTrigger>
-          <TabsTrigger value="feed">Feed</TabsTrigger>
-          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="pacts">
-          <LeftPanel />
-        </TabsContent>
-
-        <TabsContent value="feed">
-          <SocialFeed />
-        </TabsContent>
-
-        <TabsContent value="leaderboard">
-          <LeaderboardTable />
-        </TabsContent>
-      </Tabs>
+    <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
+      <LeftPanel />
     </div>
   );
 }
