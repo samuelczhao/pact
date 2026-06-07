@@ -83,6 +83,7 @@ export interface Comment {
   user_id: string;
   body: string;
   created_at: string;
+  updated_at: string;
   profile?: Profile;
 }
 

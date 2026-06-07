@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 import type { Comment } from "@/lib/types/database";
 
 export function CommentSection({ commitmentId }: { commitmentId: string }) {
@@ -19,16 +20,40 @@ export function CommentSection({ commitmentId }: { commitmentId: string }) {
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/commitments/${commitmentId}/comments`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        if (!cancelled) setComments(data);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    function fetchComments() {
+      fetch(`/api/commitments/${commitmentId}/comments`)
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => {
+          if (!cancelled) setComments(data);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }
 
-    return () => { cancelled = true; };
+    fetchComments();
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`comments:${commitmentId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "comments",
+          filter: `commitment_id=eq.${commitmentId}`,
+        },
+        () => {
+          fetchComments();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, [commitmentId]);
 
   async function handleSubmit() {
