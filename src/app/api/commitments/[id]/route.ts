@@ -17,7 +17,7 @@ export async function GET(
     return Response.json({ error: "Commitment not found" }, { status: 404 });
   }
 
-  if (data.status === "active" && new Date(data.deadline) < new Date()) {
+  if (data.status === "active" && data.deadline && new Date(data.deadline) < new Date()) {
     await supabase
       .from("commitments")
       .update({ status: "pending_proof" })

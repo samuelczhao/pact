@@ -55,7 +55,7 @@ async function fetchCommitments(
   if (data) {
     const now = new Date();
     const expired = data.filter(
-      (c) => c.status === "active" && new Date(c.deadline) < now,
+      (c) => c.status === "active" && c.deadline && new Date(c.deadline) < now,
     );
     if (expired.length > 0) {
       await supabase

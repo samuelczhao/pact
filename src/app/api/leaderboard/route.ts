@@ -12,7 +12,7 @@ export async function GET() {
 
   const { data: commitments, error: commitmentsError } = await supabase
     .from("commitments")
-    .select("creator_id, status, amount, deadline")
+    .select("creator_id, status, amount, deadline, created_at")
     .order("deadline", { ascending: false });
 
   if (commitmentsError) {
