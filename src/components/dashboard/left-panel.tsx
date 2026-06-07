@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tabs";
 import { CreatePactDialog } from "@/components/commitments/create-pact-dialog";
 import { PactList } from "@/components/commitments/pact-list";
+import { PactDetailDialog } from "@/components/commitments/pact-detail-dialog";
 import { SocialFeed } from "@/components/dashboard/social-feed";
 import { LeaderboardTable } from "@/components/dashboard/leaderboard-table";
 import type { Commitment } from "@/lib/types/database";
@@ -76,6 +77,7 @@ export function LeftPanel() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedPactId, setSelectedPactId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -154,6 +156,7 @@ export function LeftPanel() {
             <PactList
               commitments={myPacts}
               emptyMessage="No active pacts. Create one to get started."
+              onCardClick={setSelectedPactId}
             />
           )}
         </TabsContent>
@@ -165,6 +168,7 @@ export function LeftPanel() {
             <PactList
               commitments={watching}
               emptyMessage="No pacts where you're a partner."
+              onCardClick={setSelectedPactId}
             />
           )}
         </TabsContent>
@@ -176,6 +180,7 @@ export function LeftPanel() {
             <PactList
               commitments={history}
               emptyMessage="No completed or failed pacts yet."
+              onCardClick={setSelectedPactId}
             />
           )}
         </TabsContent>
@@ -188,6 +193,11 @@ export function LeftPanel() {
           <LeaderboardTable />
         </TabsContent>
       </Tabs>
+
+      <PactDetailDialog
+        commitmentId={selectedPactId}
+        onClose={() => setSelectedPactId(null)}
+      />
     </div>
   );
 }
