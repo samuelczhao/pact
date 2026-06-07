@@ -19,6 +19,7 @@ import { StatusBadge } from "@/components/commitments/status-badge";
 import { ProofSubmitForm } from "@/components/commitments/proof-submit-form";
 import { VerifyProofCard } from "@/components/commitments/verify-proof-card";
 import { VenmoPayButton } from "@/components/commitments/venmo-pay-button";
+import { CommentSection } from "@/components/commitments/comment-section";
 import {
   formatCurrency,
   formatDeadline,
@@ -253,6 +254,10 @@ export default function CommitmentDetailPage() {
           />
         </div>
       ) : null}
+
+      <div className="mt-6">
+        <CommentSection commitmentId={commitment.id} />
+      </div>
     </div>
   );
 }

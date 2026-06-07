@@ -77,6 +77,16 @@ export interface FeedEvent {
   profile?: Profile;
 }
 
+export interface Comment {
+  id: string;
+  commitment_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+  profile?: Profile;
+}
+
 export interface LeaderboardEntry {
   user_id: string;
   display_name: string;
