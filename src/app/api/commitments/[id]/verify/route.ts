@@ -66,10 +66,14 @@ export async function POST(
     .eq("id", id)
     .eq("status", "awaiting_verification")
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!data) {
+    return Response.json({ error: "Commitment is no longer awaiting verification" }, { status: 409 });
   }
 
   return Response.json(data);
