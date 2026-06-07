@@ -186,7 +186,7 @@ export function LeftPanel() {
         </TabsContent>
 
         <TabsContent value="feed" className="mt-4">
-          <SocialFeed />
+          <SocialFeed onCardClick={setSelectedPactId} />
         </TabsContent>
 
         <TabsContent value="leaderboard" className="mt-4">

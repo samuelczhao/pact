@@ -30,7 +30,11 @@ type FeedEventWithProfile = FeedEvent & {
   profile?: { display_name: string | null; avatar_url: string | null };
 };
 
-export function SocialFeed() {
+interface SocialFeedProps {
+  onCardClick?: (id: string) => void;
+}
+
+export function SocialFeed({ onCardClick }: SocialFeedProps) {
   const router = useRouter();
   const [events, setEvents] = useState<FeedEventWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +102,7 @@ export function SocialFeed() {
           <button
             key={event.id}
             type="button"
-            onClick={() => router.push(`/commitments/${event.commitment_id}`)}
+            onClick={() => onCardClick ? onCardClick(event.commitment_id) : router.push(`/commitments/${event.commitment_id}`)}
             className={`flex items-start gap-3 rounded-lg border border-zinc-800 border-l-2 ${borderColor} bg-zinc-900/50 px-3 py-3 text-left transition-colors hover:bg-zinc-800/50`}
           >
             <Avatar>
