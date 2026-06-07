@@ -80,7 +80,7 @@ export function CommentSection({ commitmentId }: { commitmentId: string }) {
             {comments.map((comment) => (
               <div key={comment.id} className="flex gap-3">
                 <Avatar className="size-7 shrink-0">
-                  <AvatarImage src={comment.profile?.avatar_url ?? undefined} />
+                  {comment.profile?.avatar_url && <AvatarImage src={comment.profile.avatar_url} />}
                   <AvatarFallback className="text-xs">
                     {(comment.profile?.display_name ?? "?")[0].toUpperCase()}
                   </AvatarFallback>
@@ -101,23 +101,32 @@ export function CommentSection({ commitmentId }: { commitmentId: string }) {
           </div>
         )}
 
-        <div className="flex gap-2">
-          <Textarea
-            placeholder="Write a comment..."
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="min-h-[40px] resize-none"
-            rows={1}
-          />
-          <Button
-            size="sm"
-            onClick={handleSubmit}
-            disabled={posting || !body.trim()}
-            className="shrink-0 self-end"
-          >
-            <Send className="size-4" />
-          </Button>
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-2">
+            <Textarea
+              placeholder="Write a comment..."
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={posting}
+              className="resize-none"
+              rows={1}
+              maxLength={2000}
+            />
+            <Button
+              size="sm"
+              onClick={handleSubmit}
+              disabled={posting || !body.trim() || body.length > 2000}
+              className="shrink-0 self-end"
+            >
+              <Send className="size-4" />
+            </Button>
+          </div>
+          {body.length > 1800 && (
+            <p className={`text-xs text-right ${body.length > 2000 ? "text-red-400" : "text-zinc-500"}`}>
+              {body.length}/2000
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
