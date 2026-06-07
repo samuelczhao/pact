@@ -10,9 +10,10 @@ import type { Commitment } from "@/lib/types/database";
 
 interface PactCardProps {
   commitment: Commitment;
+  onCardClick?: (id: string) => void;
 }
 
-export function PactCard({ commitment }: PactCardProps) {
+export function PactCard({ commitment, onCardClick }: PactCardProps) {
   const router = useRouter();
 
   const creatorName = commitment.creator?.display_name ?? "Unknown";
@@ -36,7 +37,7 @@ export function PactCard({ commitment }: PactCardProps) {
   return (
     <Card
       className="cursor-pointer transition-colors hover:bg-zinc-800/50"
-      onClick={() => router.push(`/commitments/${commitment.id}`)}
+      onClick={() => onCardClick ? onCardClick(commitment.id) : router.push(`/commitments/${commitment.id}`)}
     >
       <CardContent className="flex flex-col gap-2">
         <div className="flex items-start justify-between gap-2">
