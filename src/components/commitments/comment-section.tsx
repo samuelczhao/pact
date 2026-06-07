@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ export function CommentSection({ commitmentId }: { commitmentId: string }) {
   const [body, setBody] = useState("");
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const justPosted = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,6 +46,10 @@ export function CommentSection({ commitmentId }: { commitmentId: string }) {
           filter: `commitment_id=eq.${commitmentId}`,
         },
         () => {
+          if (justPosted.current) {
+            justPosted.current = false;
+            return;
+          }
           fetchComments();
         },
       )
@@ -74,6 +79,7 @@ export function CommentSection({ commitmentId }: { commitmentId: string }) {
       }
 
       const newComment: Comment = await res.json();
+      justPosted.current = true;
       setComments((prev) => [...prev, newComment]);
       setBody("");
     } catch (err) {
