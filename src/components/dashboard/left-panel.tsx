@@ -157,6 +157,7 @@ export function LeftPanel() {
               commitments={myPacts}
               emptyMessage="No active pacts. Create one to get started."
               onCardClick={setSelectedPactId}
+              userId={userId}
             />
           )}
         </TabsContent>
@@ -169,6 +170,7 @@ export function LeftPanel() {
               commitments={watching}
               emptyMessage="No pacts where you're a partner."
               onCardClick={setSelectedPactId}
+              userId={userId}
             />
           )}
         </TabsContent>
@@ -181,6 +183,7 @@ export function LeftPanel() {
               commitments={history}
               emptyMessage="No completed or failed pacts yet."
               onCardClick={setSelectedPactId}
+              userId={userId}
             />
           )}
         </TabsContent>

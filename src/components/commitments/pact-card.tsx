@@ -11,9 +11,10 @@ import type { Commitment } from "@/lib/types/database";
 interface PactCardProps {
   commitment: Commitment;
   onCardClick?: (id: string) => void;
+  userId?: string | null;
 }
 
-export function PactCard({ commitment, onCardClick }: PactCardProps) {
+export function PactCard({ commitment, onCardClick, userId }: PactCardProps) {
   const router = useRouter();
 
   const creatorName = commitment.creator?.display_name ?? "Unknown";
@@ -57,7 +58,7 @@ export function PactCard({ commitment, onCardClick }: PactCardProps) {
             Due {minsLeft < 60
               ? `in ${minsLeft}m`
               : `in ${Math.round(minsLeft / 60)}h`}
-             — submit proof soon
+            {userId === commitment.creator_id ? "— submit proof soon" : ""}
           </div>
         )}
 
