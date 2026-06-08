@@ -52,6 +52,7 @@ export function LeaderboardTable() {
                 <tr className="border-b border-zinc-800 text-left text-xs text-zinc-400">
                   <th className="pb-2 pr-2">#</th>
                   <th className="pb-2 pr-2">User</th>
+                  <th className="pb-2 pr-2 text-right">Score</th>
                   <th className="pb-2 pr-2 text-right">Rate</th>
                   <th className="pb-2 pr-2 text-right">Streak</th>
                   <th className="pb-2 pr-2 text-right">Lost</th>
@@ -86,6 +87,9 @@ export function LeaderboardTable() {
                           {entry.display_name}
                         </span>
                       </div>
+                    </td>
+                    <td className="py-2 pr-2 text-right font-semibold text-emerald-400">
+                      {entry.pact_score}
                     </td>
                     <td className="py-2 pr-2 text-right text-zinc-100">
                       {entry.completion_rate}%

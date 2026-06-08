@@ -35,6 +35,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
   const [deadline, setDeadline] = useState<Date | undefined>();
   const [partners, setPartners] = useState<PartnerEntry[]>([]);
   const [proofRequirement, setProofRequirement] = useState("");
+  const [dailyCheckin, setDailyCheckin] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
 
   function resetForm() {
@@ -45,6 +46,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
     setDeadline(undefined);
     setPartners([]);
     setProofRequirement("");
+    setDailyCheckin(false);
     setIsPublic(true);
   }
 
@@ -78,6 +80,7 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
           deadline: hasDeadline && deadline ? deadline.toISOString() : null,
           proof_requirement: proofRequirement.trim() || null,
           is_public: isPublic,
+          daily_checkin: dailyCheckin,
           partners: partners.map((p) => ({
             partner_id: p.partner_id ?? null,
             partner_name: p.partner_name ?? null,
@@ -186,6 +189,19 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
               onChange={(e) => setProofRequirement(e.target.value)}
             />
           </div>
+
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border border-zinc-800 px-3 py-2.5">
+            <div>
+              <p className="text-sm font-medium text-zinc-200">Daily check-in</p>
+              <p className="text-xs text-zinc-400">Must check in daily or get a strike (3 strikes = fail)</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={dailyCheckin}
+              onChange={(e) => setDailyCheckin(e.target.checked)}
+              className="size-4 accent-primary"
+            />
+          </label>
 
           <label className="flex cursor-pointer items-center justify-between rounded-lg border border-zinc-800 px-3 py-2.5">
             <div>

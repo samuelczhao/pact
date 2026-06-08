@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/commitments/status-badge";
+import { ShareButton } from "@/components/commitments/share-button";
 import { ProofSubmitForm } from "@/components/commitments/proof-submit-form";
 import { VerifyProofCard } from "@/components/commitments/verify-proof-card";
 import { VenmoPayButton } from "@/components/commitments/venmo-pay-button";
@@ -140,7 +141,12 @@ export default function CommitmentDetailPage() {
             <CardTitle className="text-xl">
               {commitment.title}
             </CardTitle>
-            <StatusBadge status={commitment.status} />
+            <div className="flex items-center gap-2">
+              {(commitment.status === "completed" || commitment.status === "failed") && (
+                <ShareButton commitmentId={commitment.id} title={commitment.title} size="sm" />
+              )}
+              <StatusBadge status={commitment.status} />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

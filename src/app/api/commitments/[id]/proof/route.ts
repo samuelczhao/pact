@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { verifyProofWithAi } from "@/lib/ai-verify";
 
 const ALLOWED_STATUSES = new Set([
   "active",
@@ -22,7 +23,7 @@ export async function POST(
 
   const { data: commitment, error: fetchError } = await supabase
     .from("commitments")
-    .select("creator_id, status")
+    .select("creator_id, status, title, proof_requirement")
     .eq("id", id)
     .single();
 
@@ -67,6 +68,28 @@ export async function POST(
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  if (commitment.proof_requirement) {
+    const verdict = await verifyProofWithAi(
+      commitment.title,
+      commitment.proof_requirement,
+      proof_text?.trim() || null,
+      proof_url?.trim() || null,
+    );
+
+    if (verdict) {
+      await supabase
+        .from("commitments")
+        .update({
+          ai_verdict: verdict.satisfied,
+          ai_confidence: verdict.confidence,
+          ai_reason: verdict.reason,
+        })
+        .eq("id", id);
+
+      return Response.json({ ...data, ai_verdict: verdict });
+    }
   }
 
   return Response.json(data);

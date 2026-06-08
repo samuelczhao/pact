@@ -12,7 +12,10 @@ import { CreatePactDialog } from "@/components/commitments/create-pact-dialog";
 import { PactList } from "@/components/commitments/pact-list";
 import { SocialFeed } from "@/components/dashboard/social-feed";
 import { LeaderboardTable } from "@/components/dashboard/leaderboard-table";
-import type { Commitment } from "@/lib/types/database";
+import { ChallengeCard } from "@/components/challenges/challenge-card";
+import { CreateChallengeDialog } from "@/components/challenges/create-challenge-dialog";
+import { JoinChallengeDialog } from "@/components/challenges/join-challenge-dialog";
+import type { Commitment, Challenge } from "@/lib/types/database";
 
 const MY_PACT_STATUSES = new Set([
   "active",
@@ -73,6 +76,7 @@ async function fetchCommitments(
 
 export function LeftPanel() {
   const [commitments, setCommitments] = useState<Commitment[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -92,8 +96,17 @@ export function LeftPanel() {
 
     fetchCommitments(wrappedSet, wrappedSetId);
 
+    async function fetchChallenges() {
+      const res = await fetch("/api/challenges");
+      if (res.ok && !cancelled) setChallenges(await res.json());
+    }
+    fetchChallenges();
+
     const supabase = createClient();
-    const refetch = () => fetchCommitments(wrappedSet, wrappedSetId);
+    const refetch = () => {
+      fetchCommitments(wrappedSet, wrappedSetId);
+      fetchChallenges();
+    };
     const channel = supabase
       .channel("my-commitments")
       .on(
@@ -104,6 +117,11 @@ export function LeftPanel() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "commitment_partners" },
+        refetch,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "challenges" },
         refetch,
       )
       .subscribe();
@@ -139,12 +157,17 @@ export function LeftPanel() {
             Watching{watching.length > 0 ? ` (${watching.length})` : ""}
           </TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
+          <TabsTrigger value="challenges">
+            Challenges{challenges.length > 0 ? ` (${challenges.length})` : ""}
+          </TabsTrigger>
           <TabsTrigger value="feed">Feed</TabsTrigger>
           <TabsTrigger value="leaderboard">Board</TabsTrigger>
           </TabsList>
-          <CreatePactDialog
-            onCreated={() => setRefreshKey((k) => k + 1)}
-          />
+          <div className="flex gap-2">
+            <JoinChallengeDialog />
+            <CreateChallengeDialog onCreated={() => setRefreshKey((k) => k + 1)} />
+            <CreatePactDialog onCreated={() => setRefreshKey((k) => k + 1)} />
+          </div>
         </div>
 
         <TabsContent value="my-pacts" className="mt-4">
@@ -177,6 +200,22 @@ export function LeftPanel() {
               commitments={history}
               emptyMessage="No completed or failed pacts yet."
             />
+          )}
+        </TabsContent>
+
+        <TabsContent value="challenges" className="mt-4">
+          {loading ? (
+            <Skeleton />
+          ) : challenges.length === 0 ? (
+            <p className="py-8 text-center text-sm text-zinc-400">
+              No challenges yet. Create one to start a group competition.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {challenges.map((c) => (
+                <ChallengeCard key={c.id} challenge={c} />
+              ))}
+            </div>
           )}
         </TabsContent>
 

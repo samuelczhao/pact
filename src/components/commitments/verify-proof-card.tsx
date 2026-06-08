@@ -118,6 +118,30 @@ export function VerifyProofCard({
           </div>
         )}
 
+        {commitment.ai_verdict !== null && commitment.ai_verdict !== undefined && (
+          <div
+            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
+              commitment.ai_verdict
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "bg-red-500/10 text-red-400"
+            }`}
+          >
+            <span className="font-medium">
+              {commitment.ai_verdict ? "AI: Likely valid" : "AI: Insufficient"}
+            </span>
+            {commitment.ai_confidence !== null && (
+              <span className="text-xs opacity-70">
+                ({Math.round(commitment.ai_confidence * 100)}% confidence)
+              </span>
+            )}
+            {commitment.ai_reason && (
+              <span className="ml-1 text-xs opacity-70">
+                — {commitment.ai_reason}
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2">
           <Button
             className="flex-1 bg-green-600 hover:bg-green-700"

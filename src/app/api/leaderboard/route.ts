@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { computePactScore } from "@/lib/pact-score";
 import type { Commitment, LeaderboardEntry } from "@/lib/types/database";
 
 const ACTIVE_STATUSES = new Set([
@@ -58,6 +59,15 @@ export async function GET() {
 
     const streak = computeStreak(userCommitments);
 
+    const pactScore = computePactScore(
+      userCommitments.map((c) => ({
+        status: c.status,
+        amount: c.amount,
+        created_at: c.created_at,
+        deadline: c.deadline,
+      })),
+    );
+
     leaderboard.push({
       user_id: userId,
       display_name: profile.display_name ?? "Anonymous",
@@ -71,10 +81,11 @@ export async function GET() {
       money_lost: moneyLost,
       money_at_risk: moneyAtRisk,
       current_streak: streak,
+      pact_score: pactScore,
     });
   }
 
-  leaderboard.sort((a, b) => b.money_lost - a.money_lost);
+  leaderboard.sort((a, b) => b.pact_score - a.pact_score);
 
   return Response.json(leaderboard);
 }

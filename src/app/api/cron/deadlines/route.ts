@@ -68,10 +68,53 @@ export async function POST(request: Request) {
     if (created) notifications1h++;
   }
 
+  // Daily check-in strikes: find active pacts with daily_checkin that weren't checked in yesterday
+  const yesterday = new Date(now.getTime() - TWENTY_FOUR_HOURS_MS)
+    .toISOString()
+    .split("T")[0];
+
+  const { data: dailyPacts } = await supabase
+    .from("commitments")
+    .select("id, creator_id, strikes, max_strikes")
+    .eq("status", "active")
+    .eq("daily_checkin", true);
+
+  let strikesIssued = 0;
+  let failedFromStrikes = 0;
+
+  for (const pact of dailyPacts ?? []) {
+    const { data: checkin } = await supabase
+      .from("challenge_checkins")
+      .select("id")
+      .eq("commitment_id", pact.id)
+      .eq("user_id", pact.creator_id)
+      .eq("checkin_date", yesterday)
+      .limit(1);
+
+    if (checkin && checkin.length > 0) continue;
+
+    const newStrikes = pact.strikes + 1;
+    if (newStrikes >= pact.max_strikes) {
+      await supabase
+        .from("commitments")
+        .update({ status: "failed", strikes: newStrikes })
+        .eq("id", pact.id);
+      failedFromStrikes++;
+    } else {
+      await supabase
+        .from("commitments")
+        .update({ strikes: newStrikes })
+        .eq("id", pact.id);
+      strikesIssued++;
+    }
+  }
+
   return Response.json({
     expired_count: expired?.length ?? 0,
     notifications_24h: notifications24h,
     notifications_1h: notifications1h,
+    strikes_issued: strikesIssued,
+    failed_from_strikes: failedFromStrikes,
   });
 }
 

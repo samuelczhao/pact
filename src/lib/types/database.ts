@@ -47,6 +47,12 @@ export interface Commitment {
   partner_email: string | null;
   proof_text: string | null;
   proof_url: string | null;
+  ai_verdict: boolean | null;
+  ai_confidence: number | null;
+  ai_reason: string | null;
+  daily_checkin: boolean;
+  strikes: number;
+  max_strikes: number;
   is_public: boolean;
   editable_until: string;
   created_at: string;
@@ -87,6 +93,53 @@ export interface Comment {
   profile?: Profile;
 }
 
+export type ChallengeStatus = "open" | "active" | "completed" | "cancelled";
+export type ProofFrequency = "daily" | "weekly";
+export type ChallengeParticipantStatus = "active" | "completed" | "failed";
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string | null;
+  stake: number;
+  start_date: string;
+  end_date: string;
+  proof_requirement: string | null;
+  proof_frequency: ProofFrequency;
+  creator_id: string;
+  max_participants: number;
+  join_code: string;
+  status: ChallengeStatus;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+  creator?: Profile;
+  participants?: ChallengeParticipant[];
+}
+
+export interface ChallengeParticipant {
+  id: string;
+  challenge_id: string;
+  user_id: string;
+  status: ChallengeParticipantStatus;
+  proof_count: number;
+  joined_at: string;
+  profile?: Profile;
+}
+
+export interface ChallengeCheckin {
+  id: string;
+  challenge_id: string;
+  user_id: string;
+  proof_text: string | null;
+  proof_url: string | null;
+  checkin_date: string;
+  ai_verdict: boolean | null;
+  ai_confidence: number | null;
+  created_at: string;
+  profile?: Profile;
+}
+
 export interface LeaderboardEntry {
   user_id: string;
   display_name: string;
@@ -98,4 +151,5 @@ export interface LeaderboardEntry {
   money_lost: number;
   money_at_risk: number;
   current_streak: number;
+  pact_score: number;
 }

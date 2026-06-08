@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/popover";
 import type { Notification } from "@/lib/types/database";
 
+const MARK_READ_DELAY_MS = 1500;
+
 async function fetchNotifications(
   setNotifications: (n: Notification[]) => void,
 ) {
@@ -22,10 +24,9 @@ async function fetchNotifications(
 
 export function NotificationBell() {
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notification[]>(
-    [],
-  );
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+  const markReadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,17 +55,36 @@ export function NotificationBell() {
     };
   }, []);
 
+  useEffect(() => {
+    if (markReadTimer.current) {
+      clearTimeout(markReadTimer.current);
+      markReadTimer.current = null;
+    }
+
+    if (!open) return;
+
+    const unreadIds = notifications
+      .filter((n) => !n.read)
+      .map((n) => n.id);
+    if (unreadIds.length === 0) return;
+
+    markReadTimer.current = setTimeout(async () => {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: unreadIds }),
+      });
+      setNotifications((prev) =>
+        prev.map((n) =>
+          unreadIds.includes(n.id) ? { ...n, read: true } : n,
+        ),
+      );
+    }, MARK_READ_DELAY_MS);
+  }, [open, notifications]);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  async function markRead(id: string) {
-    await fetch(`/api/notifications/${id}`, { method: "PATCH" });
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
-  }
-
   function handleClick(n: Notification) {
-    if (!n.read) markRead(n.id);
     if (n.commitment_id) {
       router.push(`/commitments/${n.commitment_id}`);
       setOpen(false);

@@ -5,6 +5,8 @@ import { Clock, User, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/commitments/status-badge";
 import { RoastButton } from "@/components/commitments/roast-button";
+import { ShareButton } from "@/components/commitments/share-button";
+import { CheckinButton } from "@/components/commitments/checkin-button";
 import { formatCurrency, formatDeadline, minutesRemaining } from "@/lib/utils";
 import type { Commitment } from "@/lib/types/database";
 
@@ -71,14 +73,27 @@ export function PactCard({ commitment }: PactCardProps) {
               <Clock className="size-3" />
               {commitment.deadline ? `Due ${formatDeadline(commitment.deadline)}` : "No deadline"}
             </span>
+            {commitment.daily_checkin && (
+              <span className="inline-flex items-center gap-1 text-amber-400">
+                {commitment.strikes}/{commitment.max_strikes} strikes
+              </span>
+            )}
             <span className="inline-flex items-center gap-1">
               <User className="size-3" />
               {partnerDisplay}
             </span>
           </div>
-          {(commitment.status === "active" || commitment.status === "pending_proof") && (
-            <RoastButton title={commitment.title} amount={commitment.amount} />
-          )}
+          <div className="flex items-center gap-1">
+            {commitment.daily_checkin && commitment.status === "active" && (
+              <CheckinButton commitmentId={commitment.id} />
+            )}
+            {(commitment.status === "active" || commitment.status === "pending_proof") && (
+              <RoastButton title={commitment.title} amount={commitment.amount} />
+            )}
+            {(commitment.status === "completed" || commitment.status === "failed") && (
+              <ShareButton commitmentId={commitment.id} title={commitment.title} />
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
