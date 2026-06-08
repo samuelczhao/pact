@@ -12,14 +12,18 @@ import { createClient } from "@/lib/supabase/client";
 interface ProofSubmitFormProps {
   commitmentId: string;
   onSubmitted: () => void;
+  existingProofText?: string | null;
+  existingProofUrl?: string | null;
 }
 
 export function ProofSubmitForm({
   commitmentId,
   onSubmitted,
+  existingProofText,
+  existingProofUrl,
 }: ProofSubmitFormProps) {
-  const [proofText, setProofText] = useState("");
-  const [proofUrl, setProofUrl] = useState("");
+  const [proofText, setProofText] = useState(existingProofText ?? "");
+  const [proofUrl, setProofUrl] = useState(existingProofUrl ?? "");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -129,7 +133,7 @@ export function ProofSubmitForm({
         ) : (
           <>
             <Upload className="size-4" />
-            Submit Proof
+            {existingProofText || existingProofUrl ? "Update Proof" : "Submit Proof"}
           </>
         )}
       </Button>
