@@ -213,12 +213,14 @@ export function PactDetailContent({ commitmentId, hideBackButton = false }: Pact
         <div className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Submit Proof</CardTitle>
+              <CardTitle>{commitment.proof_text || commitment.proof_url ? "Update Proof" : "Submit Proof"}</CardTitle>
             </CardHeader>
             <CardContent>
               <ProofSubmitForm
                 commitmentId={commitment.id}
                 onSubmitted={reload}
+                existingProofText={commitment.proof_text}
+                existingProofUrl={commitment.proof_url}
               />
             </CardContent>
           </Card>
