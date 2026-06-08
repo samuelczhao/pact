@@ -62,7 +62,12 @@ export function VerifyProofCard({
         throw new Error(body.error ?? "Verification failed");
       }
 
-      toast.success(approved ? "Proof approved" : "Proof rejected");
+      const data = await res.json();
+      if (approved) {
+        toast.success("Proof approved");
+      } else {
+        toast.success(data.status === "failed" ? "Proof rejected — pact failed" : "Proof rejected — creator can resubmit");
+      }
       setRejectOpen(false);
       onVerified();
     } catch (err) {
@@ -145,8 +150,8 @@ export function VerifyProofCard({
               <DialogHeader>
                 <DialogTitle>Reject proof?</DialogTitle>
                 <DialogDescription>
-                  This will mark the pact as failed. The creator will owe{" "}
-                  {formatCurrency(commitment.amount)}. This cannot be undone.
+                  This will reject the submitted proof. If the deadline
+                  hasn&apos;t passed, the creator can resubmit new proof.
                 </DialogDescription>
               </DialogHeader>
 
