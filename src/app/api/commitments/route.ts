@@ -47,6 +47,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const partnerList: PartnerInput[] = Array.isArray(partners) ? partners : [];
+  if (partner_id) {
+    partnerList.push({ partner_id, partner_name, partner_email });
+  }
+  if (partnerList.length === 0) {
+    return Response.json(
+      { error: "At least one accountability partner is required" },
+      { status: 400 },
+    );
+  }
+
   const { data, error } = await supabase
     .from("commitments")
     .insert({
@@ -71,22 +82,14 @@ export async function POST(request: Request) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  const partnerList: PartnerInput[] = Array.isArray(partners) ? partners : [];
+  const rows = partnerList.map((p) => ({
+    commitment_id: data.id,
+    partner_id: p.partner_id || null,
+    partner_name: p.partner_name?.toString().trim() || null,
+    partner_email: p.partner_email?.toString().trim() || null,
+  }));
 
-  if (partner_id && partnerList.length === 0) {
-    partnerList.push({ partner_id, partner_name, partner_email });
-  }
-
-  if (partnerList.length > 0) {
-    const rows = partnerList.map((p) => ({
-      commitment_id: data.id,
-      partner_id: p.partner_id || null,
-      partner_name: p.partner_name?.toString().trim() || null,
-      partner_email: p.partner_email?.toString().trim() || null,
-    }));
-
-    await supabase.from("commitment_partners").insert(rows);
-  }
+  await supabase.from("commitment_partners").insert(rows);
 
   return Response.json(data, { status: 201 });
 }

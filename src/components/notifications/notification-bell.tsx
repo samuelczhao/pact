@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/popover";
 import type { Notification } from "@/lib/types/database";
 
-const MARK_READ_DELAY_MS = 1500;
-
 async function fetchNotifications(
   setNotifications: (n: Notification[]) => void,
 ) {
@@ -26,7 +24,7 @@ export function NotificationBell() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
-  const markReadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markedRef = useRef(new Set<string>());
 
   useEffect(() => {
     let cancelled = false;
@@ -55,32 +53,33 @@ export function NotificationBell() {
     };
   }, []);
 
-  useEffect(() => {
-    if (markReadTimer.current) {
-      clearTimeout(markReadTimer.current);
-      markReadTimer.current = null;
-    }
-
-    if (!open) return;
-
+  const markAllRead = useCallback(async () => {
     const unreadIds = notifications
-      .filter((n) => !n.read)
+      .filter((n) => !n.read && !markedRef.current.has(n.id))
       .map((n) => n.id);
     if (unreadIds.length === 0) return;
 
-    markReadTimer.current = setTimeout(async () => {
-      await fetch("/api/notifications", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: unreadIds }),
-      });
-      setNotifications((prev) =>
-        prev.map((n) =>
-          unreadIds.includes(n.id) ? { ...n, read: true } : n,
-        ),
-      );
-    }, MARK_READ_DELAY_MS);
-  }, [open, notifications]);
+    unreadIds.forEach((id) => markedRef.current.add(id));
+
+    setNotifications((prev) =>
+      prev.map((n) =>
+        unreadIds.includes(n.id) ? { ...n, read: true } : n,
+      ),
+    );
+
+    await fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: unreadIds }),
+    });
+  }, [notifications]);
+
+  function handleOpenChange(isOpen: boolean) {
+    setOpen(isOpen);
+    if (isOpen) {
+      markAllRead();
+    }
+  }
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -92,7 +91,7 @@ export function NotificationBell() {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         render={<Button variant="ghost" size="icon" />}
       >

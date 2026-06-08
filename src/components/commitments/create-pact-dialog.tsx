@@ -66,6 +66,10 @@ export function CreatePactDialog({ onCreated }: CreatePactDialogProps) {
       toast.error("Deadline is required");
       return;
     }
+    if (partners.length === 0) {
+      toast.error("At least one accountability partner is required");
+      return;
+    }
 
     setLoading(true);
 
