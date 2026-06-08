@@ -75,7 +75,7 @@ export async function POST(request: Request) {
 
   const { data: dailyPacts } = await supabase
     .from("commitments")
-    .select("id, creator_id, strikes, max_strikes")
+    .select("id, creator_id, strikes, max_strikes, created_at")
     .eq("status", "active")
     .eq("daily_checkin", true);
 
@@ -83,6 +83,9 @@ export async function POST(request: Request) {
   let failedFromStrikes = 0;
 
   for (const pact of dailyPacts ?? []) {
+    const createdAt = new Date(pact.created_at).getTime();
+    if (now.getTime() - createdAt < TWENTY_FOUR_HOURS_MS) continue;
+
     const { data: checkin } = await supabase
       .from("challenge_checkins")
       .select("id")

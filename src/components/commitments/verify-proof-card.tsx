@@ -53,7 +53,10 @@ export function VerifyProofCard({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ approved }),
+          body: JSON.stringify({
+            approved,
+            ...(!approved && rejectReason.trim() ? { reason: rejectReason.trim() } : {}),
+          }),
         },
       );
 

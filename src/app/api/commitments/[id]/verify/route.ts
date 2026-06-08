@@ -16,12 +16,19 @@ export async function POST(
 
   const { data: commitment, error: fetchError } = await supabase
     .from("commitments")
-    .select("partner_id, status")
+    .select("creator_id, partner_id, status")
     .eq("id", id)
     .single();
 
   if (fetchError || !commitment) {
     return Response.json({ error: "Commitment not found" }, { status: 404 });
+  }
+
+  if (commitment.creator_id === user.id) {
+    return Response.json(
+      { error: "Cannot verify your own pact" },
+      { status: 403 },
+    );
   }
 
   const isLegacyPartner = commitment.partner_id === user.id;

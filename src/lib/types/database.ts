@@ -129,7 +129,8 @@ export interface ChallengeParticipant {
 
 export interface ChallengeCheckin {
   id: string;
-  challenge_id: string;
+  challenge_id: string | null;
+  commitment_id: string | null;
   user_id: string;
   proof_text: string | null;
   proof_url: string | null;

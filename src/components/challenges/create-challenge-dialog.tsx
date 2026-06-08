@@ -56,6 +56,11 @@ export function CreateChallengeDialog({ onCreated }: CreateChallengeDialogProps)
       toast.error("Start and end dates required");
       return;
     }
+    const today = new Date().toISOString().split("T")[0];
+    if (startDate < today) {
+      toast.error("Start date cannot be in the past");
+      return;
+    }
     if (new Date(endDate) <= new Date(startDate)) {
       toast.error("End date must be after start date");
       return;

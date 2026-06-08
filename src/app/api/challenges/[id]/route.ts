@@ -33,6 +33,24 @@ export async function GET(
       .eq("id", id)
       .eq("status", "active");
     data.status = "completed";
+
+    const startMs = new Date(data.start_date).getTime();
+    const endMs = new Date(data.end_date).getTime();
+    const durationDays = Math.max(1, Math.round((endMs - startMs) / 86400000));
+    const requiredProofs = data.proof_frequency === "weekly"
+      ? Math.max(1, Math.floor(durationDays / 7))
+      : durationDays;
+    const threshold = Math.ceil(requiredProofs * 0.5);
+
+    for (const p of data.participants ?? []) {
+      const newStatus = p.proof_count >= threshold ? "completed" : "failed";
+      await supabase
+        .from("challenge_participants")
+        .update({ status: newStatus })
+        .eq("id", p.id)
+        .eq("status", "active");
+      p.status = newStatus;
+    }
   }
 
   return Response.json(data);

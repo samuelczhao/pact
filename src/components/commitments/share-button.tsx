@@ -13,7 +13,8 @@ interface ShareButtonProps {
 
 export function ShareButton({ commitmentId, title, size = "xs" }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
-  const shareUrl = `https://pactlnl.vercel.app/share/${commitmentId}`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://pactlnl.vercel.app";
+  const shareUrl = `${origin}/share/${commitmentId}`;
 
   async function handleShare() {
     const shareData = {

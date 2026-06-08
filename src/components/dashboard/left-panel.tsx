@@ -148,25 +148,27 @@ export function LeftPanel() {
   return (
     <div className="flex flex-col gap-4">
       <Tabs defaultValue="my-pacts">
-        <div className="flex items-center justify-between gap-4">
-          <TabsList variant="line" className="flex-1">
-          <TabsTrigger value="my-pacts">
-            Active{myPacts.length > 0 ? ` (${myPacts.length})` : ""}
-          </TabsTrigger>
-          <TabsTrigger value="watching">
-            Watching{watching.length > 0 ? ` (${watching.length})` : ""}
-          </TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="challenges">
-            Challenges{challenges.length > 0 ? ` (${challenges.length})` : ""}
-          </TabsTrigger>
-          <TabsTrigger value="feed">Feed</TabsTrigger>
-          <TabsTrigger value="leaderboard">Board</TabsTrigger>
-          </TabsList>
-          <div className="flex gap-2">
-            <JoinChallengeDialog />
-            <CreateChallengeDialog onCreated={() => setRefreshKey((k) => k + 1)} />
-            <CreatePactDialog onCreated={() => setRefreshKey((k) => k + 1)} />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <TabsList variant="line" className="flex-1 overflow-x-auto">
+              <TabsTrigger value="my-pacts">
+                Active{myPacts.length > 0 ? ` (${myPacts.length})` : ""}
+              </TabsTrigger>
+              <TabsTrigger value="watching">
+                Watching{watching.length > 0 ? ` (${watching.length})` : ""}
+              </TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+              <TabsTrigger value="challenges">
+                Challenges{challenges.length > 0 ? ` (${challenges.length})` : ""}
+              </TabsTrigger>
+              <TabsTrigger value="feed">Feed</TabsTrigger>
+              <TabsTrigger value="leaderboard">Board</TabsTrigger>
+            </TabsList>
+            <div className="flex shrink-0 gap-2">
+              <JoinChallengeDialog />
+              <CreateChallengeDialog onCreated={() => setRefreshKey((k) => k + 1)} />
+              <CreatePactDialog onCreated={() => setRefreshKey((k) => k + 1)} />
+            </div>
           </div>
         </div>
 

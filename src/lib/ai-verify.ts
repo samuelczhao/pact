@@ -41,7 +41,8 @@ Respond with ONLY a JSON object (no markdown, no code fences):
       contents: prompt,
     });
 
-    const text = response.text?.trim() ?? "";
+    let text = response.text?.trim() ?? "";
+    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
     const parsed = JSON.parse(text) as AiVerdict;
 
     if (

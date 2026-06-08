@@ -89,7 +89,14 @@ export async function POST(request: Request) {
     partner_email: p.partner_email?.toString().trim() || null,
   }));
 
-  await supabase.from("commitment_partners").insert(rows);
+  const { error: partnerError } = await supabase
+    .from("commitment_partners")
+    .insert(rows);
+
+  if (partnerError) {
+    await supabase.from("commitments").delete().eq("id", data.id);
+    return Response.json({ error: "Failed to add partners" }, { status: 500 });
+  }
 
   return Response.json(data, { status: 201 });
 }
