@@ -58,14 +58,14 @@ export function PactCard({ commitment, onCardClick, userId }: PactCardProps) {
             Due {minsLeft < 60
               ? `in ${minsLeft}m`
               : `in ${Math.round(minsLeft / 60)}h`}
-            {userId === commitment.creator_id && " · submit proof soon"}
+            {userId === commitment.creator_id && " · Submit proof soon"}
           </div>
         )}
 
         {isOverdue && (
           <div className="flex items-center gap-1.5 rounded-md bg-red-500/10 px-2 py-1 text-xs font-medium text-red-400">
             <AlertTriangle className="size-3" />
-            Overdue{userId === commitment.creator_id && " · submit proof now"}
+            Overdue{userId === commitment.creator_id && " · Submit proof now"}
           </div>
         )}
 
