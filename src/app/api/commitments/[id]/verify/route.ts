@@ -16,7 +16,7 @@ export async function POST(
 
   const { data: commitment, error: fetchError } = await supabase
     .from("commitments")
-    .select("partner_id, status")
+    .select("partner_id, status, deadline")
     .eq("id", id)
     .single();
 
@@ -58,7 +58,13 @@ export async function POST(
     );
   }
 
-  const newStatus: CommitmentStatus = approved ? "completed" : "failed";
+  let newStatus: CommitmentStatus;
+  if (approved) {
+    newStatus = "completed";
+  } else {
+    const hasTimeLeft = commitment.deadline && new Date(commitment.deadline) > new Date();
+    newStatus = hasTimeLeft ? "active" : "failed";
+  }
 
   const { data, error } = await supabase
     .from("commitments")
