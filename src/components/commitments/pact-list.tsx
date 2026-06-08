@@ -6,9 +6,10 @@ interface PactListProps {
   commitments: Commitment[];
   emptyMessage: string;
   onCardClick?: (id: string) => void;
+  userId?: string | null;
 }
 
-export function PactList({ commitments, emptyMessage, onCardClick }: PactListProps) {
+export function PactList({ commitments, emptyMessage, onCardClick, userId }: PactListProps) {
   if (commitments.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-12 text-center">
@@ -21,7 +22,7 @@ export function PactList({ commitments, emptyMessage, onCardClick }: PactListPro
   return (
     <div className="flex flex-col gap-2">
       {commitments.map((c) => (
-        <PactCard key={c.id} commitment={c} onCardClick={onCardClick} />
+        <PactCard key={c.id} commitment={c} onCardClick={onCardClick} userId={userId} />
       ))}
     </div>
   );
